@@ -1,4 +1,6 @@
-# 리눅스  명령어
+<details>
+<summary><h2>리눅스 기본 명령어</h2></summary>
+<div markdown="1">
 
 ## --help
 ➡️ 명령어 뒤에 --help를 붙이면 명령어의 사용설명서가 출력된다.
@@ -377,7 +379,7 @@ eunyoung@BOOK-6MKSS57FS2:~$ chown key hello.html
 # 사용구문 : chown :[그룹식별자] [파일명]
 eunyoung@BOOK-6MKSS57FS2:~$ chown :kim hello.html
 ```
-# chmod
+## chmod
 ➡️ "change mod"의 약자로, 파일의 권한을 변경하 수 있는 명령어이다.
 ```
 사용 구문 : chmod [옵션] [모드] [파일명]
@@ -550,3 +552,546 @@ eunyoung@BOOK-6MKSS57FS2:~$ man grep
 사용 구문 : kill -9 [PID번호]
 ```
 
+</div>
+</details>
+
+
+<details>
+<summary><h2>리눅스 Shell Script</h2></summary>
+<div markdown="1">
+
+- Linex Shell이란?
+  - 사용자 명령어 해석기
+  - 사용자가 프롬프트에 입력한 명령을 해석해서 운영체제에 전달
+```
+## 사용가능한 shell 리스트 확인하기
+eunyoung@BOOK-6MKSS57FS2:~$ cat /etc/shells
+# /etc/shells: valid login shells
+/bin/sh
+/bin/bash
+/usr/bin/bash
+/bin/rbash
+/usr/bin/rbash
+/bin/dash
+/usr/bin/dash
+/usr/bin/tmux
+/usr/bin/screen
+
+## 현재 작업 shell 확인
+eunyoung@BOOK-6MKSS57FS2:~$ echo $SHELL
+/bin/bash
+```
+
+# Bash Shell과 변수
+- Shell의 변수란?
+   - 데이터를 넣는 그릇
+   - 선언한 필요없이 사용 가능
+   - 변수명 : 문자, 숫자, _(언더바)로 구성될 수 있지만, 시작은 반드시 문자나 _로 시작
+```
+# 쉘 선언
+eunyoung@BOOK-6MKSS57FS2:~$ #!/bin/bash
+
+# 변수 생성
+1. 일반변수
+사용 구문 : 변수명=변수값
+eunyoung@BOOK-6MKSS57FS2:~$ fname=eunyoung
+eunyoung@BOOK-6MKSS57FS2:~$ lnamee = kim
+lnamee: command not found
+→ 변수를 생성할 때 빈칸은 존재하면 안된다.
+
+2. 환경변수
+사용 구문 : export 변수명=변수값
+→ 환경변수는 전달되는 명령어에 영향을 주는 변수로 일반변수와 내부적으로 다른 구조이다.
+eunyoung@BOOK-6MKSS57FS2:~$ export NAME=key
+
+# 변수 확인
+사용 구문 : echo $변수명
+eunyoung@BOOK-6MKSS57FS2:~$ echo $fname
+eunyoung
+
+eunyoung@BOOK-6MKSS57FS2:~$ echo "my name is ${fname}" // {}가 있으나 없으나 $만으로 변수의 값을 넣어줄 수 있으나, 문자열을 붙여서 쓸려면 ${} 를 사용해야 한다.
+my name is eunyoung
+
+# 변수 제거
+사용 구문 : unset 변수명
+eunyoung@BOOK-6MKSS57FS2:~$ unset fname
+```
+## 매개 변수
+➡️ 프로그램에서도 실행할때 인자를 주듯 쉘 스크립트도 역시 그렇게 할 수 있다. <br>
+실행한 스크립트 이름은 "${0}" 그 이후는 전달받은 인자 값들이다 (${1}, ${2}, ...)
+```
+$0	실행된 셸 스크립트명
+$1	스크립트에 넘겨진 첫 번째 아규먼트 
+$2	스크립트에 넘겨진 두 번째 아규먼트
+$3 S4 등등...쭈욱 이후 $숫자	그 이후 해당되는 아규먼트 
+$#	아규먼트 개수 
+$*	스크립트에 전달된 인자 전체를 하나의 변수에 저장하면 IFS 변수의 첫 번째 문자로 구분
+$@	$*와 동일한데 다른 점은 IFS 환경 변수를 사용하지 않는다는 점. 
+$!	실행을 위해 백그라운드로 보내진 마지막 프로그램 프로세스 번호 
+$$	셸 스크립트의 PID
+$?	실행한 뒤의 반환 값 (백그라운드로 실행된 것 제외)
+
+사용 구문
+1. echo "script name : ${0}"
+2. echo "매개변수 갯수 : ${#}"
+3. echo "전체 매개변수 값 : ${*}"
+4. echo "전체 매개변수 값2 : ${@}"
+5. echo "매개변수 1 : ${1}"
+6. echo "매개변수 2 : ${2}"
+```
+
+## 예약 변수
+➡️ 쉘 스크립트에서 사용자가 정해서 만들 수 없는 이미 정의된 변수가 존재한다. <br>
+이 변수명을 피해서 스크립트를 작성해야 한다.
+
+| 변수 |	설명 |
+| :-: | :-: |
+| HOME |	사용자 홈 디렉토리 |
+| PATH |	실행 파일의 경로 |
+| LANG |	프로그램 실행 시 지원되는 언어 |
+| UID	 | 사용자의 UID |
+| SHELL |	사용자가 로그인시 실행되는 쉘 |
+| USER |	사용자의 계정 이름 |
+| FUNCNAME |	현재 실행되고 있는 함수 이름 |
+| TERM |	로그인 터미널 |
+
+```
+이 외의 변수 명령어
+
+set : 셸 변수를 출력하는 명령어
+env : 환경 변수를 출력하는 명령어
+export : 특정 변수의 범위를 환경 변수의 데이터 공간으로 전송하여 자식 프로세스에서도 특정 변수를 사용 가능하게 한다. 전역 변수의 개념
+unset : 선언된 변수를 제거한다.
+```
+## 셀 산술 연산
+➡️ Bash 변수는 본질적으로 문자열이라 별도의 특수한 문법을 사용해 연산을 해야 한다. <br>
+```
+# Bash에서 계산 처리하는 3가지 문법
+1. expr
+2. let
+3. $(())
+
+1. expr 연산자
+- expr는 역따옴표를 반드시 감싸준다. 역따옴표 대신 $(( )) 해줘도 동작은 한다.
+- expr을 사용할 때 피연산자와 연산자 사이에 공백이 필요하다.
+- 산술 연산할때 우선순위를 지정하기위해 괄호를 사용하려면 \처리를 해줘야 한다.
+- 곱셈 문자 *는 \처리를 해주어야 한다.
+
+eunyoung@BOOK-6MKSS57FS2:~$ plus=`expr $number1 + $number2`
+eunyoung@BOOK-6MKSS57FS2:~$ minus=`expr $number1 - $number2`
+eunyoung@BOOK-6MKSS57FS2:~$ mul=`expr $number1 \* $number2`  
+→ 곱셈에는 \* 를 이용한다.
+→ 연산자 *와 괄호() 앞에는 역슬래시와 같이 사용
+eunyoung@BOOK-6MKSS57FS2:~$ div=`expr $number1 / $number2`
+eunyoung@BOOK-6MKSS57FS2:~$ rem=`expr $number1 % $number2`
+
+2. let 연산자
+eunyoung@BOOK-6MKSS57FS2:~$ let re=number1+number2
+eunyoung@BOOK-6MKSS57FS2:~$ let re=number1-number2
+eunyoung@BOOK-6MKSS57FS2:~$ let re=number1*number2
+eunyoung@BOOK-6MKSS57FS2:~$ let re=number1/number2
+eunyoung@BOOK-6MKSS57FS2:~$ let re=number1%number2
+
+3. $(( )) 연산자
+eunyoung@BOOK-6MKSS57FS2:~$ echo add:$((number1+number2))
+add:30
+eunyoung@BOOK-6MKSS57FS2:~$ echo sub:$((number1-number2))
+sub:-10
+eunyoung@BOOK-6MKSS57FS2:~$ echo mul:$((number1*number2))
+mul:200
+eunyoung@BOOK-6MKSS57FS2:~$ echo div:$((number1/number2))
+div:0
+eunyoung@BOOK-6MKSS57FS2:~$ echo mod:$((number1%number2))
+mod:10
+```
+
+## 셀 조건문
+
+### if문
+➡️ if문의 특징은 fi 와 대괄호[ ] 이다. <br>
+여타 언어와 달리 중괄호를 안쓰기 떄문에 fi로 if문의 끝을 알려주어야 하며, <br>
+주의해야할 점은 if문 뒤에 나오는 대괄호 [ ] 와 조건식 사이에는 반드시 공백이 존재해야 한다. <br>
+
+사용 구문 :  <br>
+if [ 값1 조건식 값2 ]
+then
+    수행1
+else
+    수행2
+fi
+<br>
+
+if [ 값1 조건식 값2 ]; then
+    수행1
+else
+    수행2
+fi <br>
+→ then을 if [] 와 붙여쓰려면 반드시 세미콜론 ; 을 써야한다.
+
+| 문자1 = 문자2 | 문자1 과 문자2가 일치 (sql같이 = 하나만 써도 일치로 인식) | 
+| :-: | :-: |
+| 문자1 == 문자2 | 문자1 과 문자2가 일치 | 
+| 문자1 != 문자2 | 문자1 과 문자2가 일치하지 않음 | 
+| -z 문자 | 문자가 null 이면 참 | 
+| -n 문자 | 문자가 null 이 아니면 참 | 
+| 문자 == 패턴 | 문자열이 패턴과 일치 | 
+| 문자 != 패턴 | 문자열이 패턴과 일치하지 않음 | 
+| 값1 -eq 값2 | 값이 같음(equal) | 
+| 값1 -ne 값2 | 값이 같지 않음(not equal) | 
+| 값1 -lt 값2 | 값1이 값2보다 작음(less than) | 
+| 값1 -le 값2 | 값1이 값2보다 작거나 같음(less or equal) | 
+| 값1 -gt 값2 | 값1이 값2보다 큼(greater than) | 
+ 값1 -ge 값2 | 값1이 값2보다 크거나 같음(greater or equal) | 
+
+### 이중 괄호 ((expression))
+→ expression 에는 수식이나 비교 표현식이 들어갈 수 있다.
+
+| ! | 논리 부정 | 
+| :-: | :-: |
+| ~ | 비트 부정 | 
+| ** | 지수화 | 
+| << | 비트 왼쪽 쉬프트 | 
+| >> | 비트 오른쪽 쉬프트 | 
+| & | 비트 단위AND | 
+| | | 비트 단위 OR | 
+| && | 논리 AND | 
+| || | 논리 OR | 
+| num++ | 후위증가 | 
+| num-- | 후위감소++ | 
+| num | 전위증가 | 
+| --num | 전위감소 | 
+```
+#!/bin/bash
+function func(){
+
+a=10
+b=5
+
+if [ ${a} -eq ${b} ]; then
+        echo "a와 b는 같다."
+fi
+
+if [ ${a} -ne ${b} ]; then
+        echo "a와 b는 같지않다."
+fi
+
+}
+
+#함수 호출
+func
+```
+
+### 파일 검사
+
+
+| if [ -d ${변수} ]; then | ${변수}의 디렉토리가 존재하면 참 | 
+| :-: | :-: |
+| if [ ! -d ${변수} ]; then	| ${변수}의 디렉토리가 존재하지 않으면 참 | 
+| if [ -e ${변수} ]; then | ${변수}라는 파일이 존재하면 참 |  
+| if [ ! -e ${변수} ]; then | ${변수}라는 파일이 존재하지 않으면 참 | 
+| if [ -r ${변수} ]; then | 파일을 읽을 수 있으면 참 | 
+| if [ -w ${변수} ]; then | 파일을 쓸 수 있으면 참 | 
+| if [ -x ${변수} ]; then | 파일을 실행할 수 있으면 참 | 
+| if [ -s ${변수} ]; then | 파일의 크기가 0보다 크면 참 | 
+| if [ -L ${변수} ]; then | 파일이 symbolic link이면 참 | 
+| if [ -S ${변수} ]; then | 파일 타입이 소켓이면 참 | 
+| if [ -f ${변수} ]; then | 파일이 정규 파일이면 참 | 
+| if [ -c ${변수} ]; then | 파일이 문자 장치이면 참 | 
+| if [ ${변수1} -nt ${변수2}]; then | 변수1의 파일이 변수2의 파일보다 최신 파일이면 참 | 
+| if [ ${변수1} -ot ${변수2}]; then | 변수1의 파일이 변수2의 파일보다 최신이 아니면 참 | 
+| if [ ${변수1} -ef ${변수2}]; then | 변수1의 파일과 변수2의 파일이 동일하면 참 | 
+```
+eunyoung@BOOK-6MKSS57FS2:~/script$ chmod +x backup // 파일이 실행가능하도록 '실행'기능 추가
+#!/bin/bash
+if ! [ -d bak ]; then #현재 디렉토리에 bak라는 디렉토리가 존재하지 않는다면
+        mkdir bak #bak라는 디렉토리를 생성한다.
+fi
+cp *.log bak
+```
+
+### 논리 연산
+
+| 조건1 -a 조건2 | AND | 
+| :-: | :-: |
+| 조건1 -o 조건2 | OR | 
+| 조건1 && 조건2 | 양쪽 다 성립 |  
+| 조건1 || 조건2 | 한쪽 또는 양쪽다 성립 | 
+| !조건 | 조건이 성립하지 않음 | 
+| true | 조건이 언제나 성립 | 
+| false | 조건이 언제나 성립하지 않음 | 
+
+```
+#!/bin/bash
+
+if [ -f ${myfile1} -a -f ${myfile2} ]; then  # myfile1과 myfile2는 모두 정규 파일이다.
+        echo "myfile1과 myfile2는 모두 파일입니다."
+else
+        echo "myfile1과 myfile2는 모두 파일인 것은 아닙니다."
+fi
+-----------------------------------------------------------------------------------------------
+value=10
+
+if [ ${value} -gt 5 -a ${value} -lt 15 ]; then
+        echo "value의 값은 5보다 크고 15보다 작다."
+fi
+
+# 위의 문장과 동일한 문장이다.
+if [ ${value} -gt 5 ] && [ ${value} -lt 15 ]; then
+        echo "value의 값은 5보다 크고 15보다 작다."
+fi
+
+# 대괄호 두개를 써서 표현할 수 있다.
+if [[ ${value} -gt 5 && ${value} -lt 15 ]]; then
+        echo "value의 값은 5보다 크고 15보다 작다."
+fi
+```
+### if elif else 문
+
+```
+#!/bin/bash
+ 
+num1="10"
+num2="10"
+ 
+if [ ${num1} -lt ${num2} ]; then # "-lt", A가 B보다 작으면 True
+    echo "yes"
+elif [ ${num1} -eq ${num2} ]; then # "-eq", A와 B가 서로 같으면 True
+    echo "bbb"
+else
+    echo "no"
+fi
+```
+### case 문
+➡️ 각 case의 끝을 보면 세미콜론 2개로 종료한다. <br>
+case 문자열 in
+ 경우1) 
+    명령 명령 명령
+    ;;
+ 경우2)
+    명령 명령 명령
+    ;;
+ * )
+    명령 명령 명령
+    ;;
+esac
+```
+#!/bin/bash
+
+value="linux"
+
+case ${value} in
+        "linux") echo "리눅스" ;;
+        "java") echo "자바" ;;
+        "oracle") echo "오라클" ;;
+        "windows") echo "윈도우" ;;
+        *) echo "아무것도아님" ;;
+esac
+
+COUNTRY=korea
+ 
+case $COUNTRY in
+  "korea"|"japan"|"china") # or 연산도 가능하다
+    echo "$COUNTRY is Asia"
+    ;;
+  "USA"|"Canada"|"Mexico")
+    echo "$COUNTRY is Ameria"
+    ;;
+  * )
+    echo "I don't know where is $COUNTRY"
+    ;;
+esac
+```
+## 쉘 반복문
+
+### for문
+```
+#!/bin/bash
+
+# 초기값; 조건값; 증가값을 사용한 전통적인 for문
+for ((i=1; i<5; i++)); do
+        echo $i
+done
+```
+### for in문
+```
+# 변수를 사용한 반복문
+value="1 2 3 4 5 6"
+for x in ${value}
+do
+        echo ${x}
+done
+
+# 배열을 사용한 반복문
+arr=(10 20 30 40 50)
+for a in ${arr[@]}
+do
+        echo ${a}
+done
+```
+### while문
+```
+#!/bin/bash
+
+count=0
+while [ ${count} -le 5 ]; # count가 5보다 작을때까지
+do
+        echo ${count}
+        count=$(( ${count}+1 )) # count에 1씩 추가
+done
+
+val=0
+while (( ${val} <= 5 )); # 이중괄호 (()) 사용하면 논리연산자 사용 가능
+do
+        echo ${val}
+        val=$(( ${val}+1 ))
+done
+```
+
+### until문
+➡️ 수행 조건이 false 일때 실행되는 루프문이다. 즉, while의 반대버젼이라고 보면 된다. (while은 조건이 true 면 루프)
+```
+count=20
+
+until [ ${count} -le 5 ]; do # count값이 5보다 작다.
+        echo ${count}
+        count=$(( ${count}-1 ))
+done
+```
+
+## 쉘 배열문
+### 배열 생성/추가
+```
+#!/bin/bash
+
+# 배열의 크기 지정없이 배열 변수 선언
+# 굳이 'declare -a' 명령으로 선언하지 않아도 바로 배열 변수 사용 가능함
+declare -a array
+
+arr=("test1" "test2" "test3") # 배열 선언 및 지정
+
+echo ${arr[0]}  # test1
+
+
+# 기존 배열에 1개의 배열 값 추가 3가지 방법
+arr[3]="test4"
+arr+=("test5")
+arr[${#arr[@]}]="test6" # 배열 길이를 인덱스로 사용해 push
+arr[${#arr[@]}]="test7"
+
+echo ${arr[@]}  # arr의 모든 데이터 출력
+echo ${arr[*]}  # arr의 모든 데이터 출력
+echo ${#arr[@]} # arr 배열 길이 출력
+
+echo ${arr[@]:2:3} # 인덱스 2부터 3개의 요소 출력
+```
+### 배열 원소 삭제
+➡️ /를 사용해 해당 문자열 부분이 있으면 삭제 할 수 있다. 다만, unset을 이용해 삭제를 권고하는 편이다.
+```
+  GNU nano 4.8                                          if                                          Modified  #!/bin/bash
+
+arr=(1 2 3)
+remove=(3)
+
+arr=( "${arr[@]/$remove}" )
+echo ${arr[@]}
+
+arr2=("abc" "bbb" "efg")
+unset arr2[0] # arr2의 0번 인덱스 값 삭제
+echo ${arr2[@]}
+unset array # 배열 전체 삭제
+```
+### 연관 배열 MAP
+➡️ key와 value 타입으로 저장된 배열을 말한다. 
+```
+#!/bin/bash
+
+# 연관배열 생성
+declare -A map=([key1]="hello" [key2]="linux" [what is it]=12345 [key3]="good")
+
+declare -p map # 연관배열 정보 출력
+
+echo "map[key1]=${map[key1]}"
+# 값 : map[key1]=hello
+
+key=key1
+echo "map[key]=${map=[${key}]}"
+# 값 : map[key]=[key1]
+
+# 연관배열 value 값 모두 출력 (MAP은 순서를 보장하지않는다)
+echo "배열전체=${map[@]}"
+# 값 : 배열전체=12345 linux good hello [key1]
+
+# 연관배열 key 인덱스 모두 출력 (MAP은 순서를 보장하지않는다)
+echo "key,인덱스=${!map[@]}"
+#값 : key,인덱스=what is it key2 key3 key1 0
+
+# 연관배열 길이 출력
+echo "길이:${#map[@]}"
+#값 : 길이:5
+
+# 배열 원소 추가
+map+=([linux]=hi)
+map+=([linux2]=a [linux2]=b)
+
+echo ${map[@]}
+# 값 : 12345 linux good hello [key1] hi b
+
+# 배열 원소 삭제
+unset 'map[key1]' # key로 삭제
+
+echo ${map[@]}
+# 값 : 12345 linux good [key1] hi b
+# key1의 값인 hello가 사라진 것을 확인할 수 있다.
+```
+## 쉘 함수
+➡️ 쉘 스크립트에서는 함수명 앞 function은 써주지 않아도 알아서 인식된다. <br>
+또한, 함수를 호출할때는 괄호를 써주지 않고 호출해야한다는 점이 다르다. 그리고 함수 호출 코드는 함수 코드보다 반드시 뒤에 있어야 된다. <br>
+함수 코드 보다 앞에서 호출 시 오류가 발생하기 때문이다.
+```
+#!/bin/bash
+
+func(){
+        echo "함수실행!"
+}
+
+# 함수실행
+func
+# 값 : 함수실행!
+
+function string_test(){
+        echo "string test"
+        echo "인자값=${@}"
+}
+
+#함수에 인자값 전달하기(공백으로 뛰어서 2개의 인자값을 넘김)
+string_test "hello" "linux"
+# 값 : string_test
+# 값 : 인자값=hello linux
+```
+
+## 명령어 종료 상태 코드
+➡️ 종료 코드란, exit 명령으로 프로그램을 종료시키면서 사용자에게 ***프로그램 종료의 이유***를 알리기 위하여 반환하는 값이다. <br>
+쉘 스크립트 내에서 exit 명령어가 실행되면 스크립트가 종료되며 부모 프로세스에 종료 상태를 전달할 수 있는데 이 값은 프로그램 내에서 임의로 지정할 수도 있다.  <br>
+일반적으로 종료 코드가 0이면 명령이 성공적으로 완료되었음을 나타내고 0이 아니면 오류가 발생했음을 나타낸다. 
+
+| 종료 코드 | 설명 | 
+| :-: | :-: |
+| 0 | 성공 |
+| 1 | 일반적인 오류 | 
+| 2 | 셸 내장 명령의 틀린 사용 |
+| 126 | 파일이 실행되지 않음 |
+| 127 | 명령어를 찾을 수 없음 |
+| 128 | 종료할 때 잘못된 인수 적용 |
+| 128+n | 치명적인 시그널 n 에러 |
+| 130 | ctrl + n 키 조합에 의한 종료 |
+```
+exit 16 # 강제 종료
+echo "hello linux" # 실행 안됨
+
+date &> /dev/null
+echo $?
+# 값 : 0 반환
+```
+
+</div>
+</details>
